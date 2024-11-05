@@ -3,6 +3,7 @@ import numpy as np
 
 
 class I:
+    num_qubits = 1
     matrix = np.array([[1, 0],
                        [0, 1]])
 
@@ -11,6 +12,7 @@ class I:
 
 
 class X:
+    num_qubits = 1
     matrix = np.array([[0, 1],
                        [1, 0]])
 
@@ -19,6 +21,7 @@ class X:
 
 
 class H:
+    num_qubits = 1
     matrix = 1/np.sqrt(2) * np.array([[1, 1],
                                       [1, -1]])
 
@@ -27,17 +30,23 @@ class H:
 
 
 class CNOT:
+    num_qubits = 2
 
     def __init__(self, control, target):
         self.control = control
         self.target = target
 
+    def _min(self):
+        return min(self.control, self.target)
+
+    def _max(self):
+        return max(self.control, self.target)
+
     @property
     def matrix(self):  # as |0><0|⊗I + |1><1|⊗X
-        nqubits = abs(self.control - self.target) + 1
-        shift = min(self.control, self.target)
-        ctrl = self.control - shift
-        targ = self.target - shift
+        nqubits = self._max() - self._min() + 1
+        ctrl = self.control - self._min()
+        targ = self.target - self._min()
         # compute first term
         term0 = [I.matrix] * nqubits
         term0[ctrl] = np.array([[1, 0],
