@@ -1,0 +1,6 @@
+numpy
+
+# just for testing
+qiskit
+pytest
+hypothesis
