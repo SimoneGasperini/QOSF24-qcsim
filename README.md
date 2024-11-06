@@ -10,3 +10,5 @@ To test the software implementing the statevector simulator for quantum circuits
 ```bash
 pytest -v tests
 ```
+
+> In the [notebooks](https://github.com/SimoneGasperini/QOSF24-qcsim/tree/master/notebooks) directory of the repository you can find some Jupyter notebooks showing the tests required for completing the task (e.g. simulation runtime VS number of qubits).

@@ -1,6 +1,7 @@
 numpy
 
-# just for testing
+# just for plotting and testing
+matplotlib
 qiskit
 pytest
 hypothesis
