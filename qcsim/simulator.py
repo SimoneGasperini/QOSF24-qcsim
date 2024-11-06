@@ -1,23 +1,66 @@
 import functools
 import numpy as np
+from qcsim.gates import I
 
 
 class Simulator:
 
-    def __init__(self):
-        pass
+    def __init__(self, method):
+        # method: "matrix-mul" or "tensor-mul"
+        self.method = method
 
     def _init_statevector(self, num_qubits):
-        zeros = [np.array([1, 0])] * num_qubits
-        self._statevector = functools.reduce(np.kron, zeros)
+        state = np.zeros(2**num_qubits)
+        state[0] = 1
+        self._statevector = state
 
-    def run(self, circuit):
-        self._init_statevector(num_qubits=circuit.num_qubits)
+    def _init_statetensor(self, num_qubits):
+        state = np.zeros((2,) * num_qubits)
+        state[(0,) * num_qubits] = 1
+        self._statetensor = state
+
+    def _run_matrix_mul(self, circuit):
+        self._init_statevector(circuit.num_qubits)
         for layer in circuit._data:
             matrices = [gate.matrix for gate in layer[::-1]
                         if gate is not None]
             operator = functools.reduce(np.kron, matrices)
             self._statevector = operator @ self._statevector
 
+    def _apply_1q_gate(self, gate):
+        gate_tensor = gate._matrix
+        i = -gate.qubit - 1
+        self._statetensor = np.tensordot(
+            gate_tensor, self._statetensor, axes=(1, i))
+        self._statetensor = np.moveaxis(self._statetensor, 0, i)
+
+    def _apply_2q_gate(self, gate):
+        gate_tensor = gate._matrix.reshape(2, 2, 2, 2)
+        c = -gate.control - 1
+        t = -gate.target - 1
+        self._statetensor = np.tensordot(
+            gate_tensor, self._statetensor, axes=((2, 3), (c, t)))
+        self._statetensor = np.moveaxis(self._statetensor, (0, 1), (c, t))
+
+    def _run_tensor_mul(self, circuit):
+        self._init_statetensor(circuit.num_qubits)
+        gates = [gate for layer in circuit._data for gate in layer
+                 if gate is not None and not isinstance(gate, I)]
+        for gate in gates:
+            if gate.num_qubits == 1:
+                self._apply_1q_gate(gate)
+            elif gate.num_qubits == 2:
+                self._apply_2q_gate(gate)
+
+    def run(self, circuit):
+        if self.method == 'matrix-mul':
+            self._run_matrix_mul(circuit)
+        elif self.method == 'tensor-mul':
+            self._run_tensor_mul(circuit)
+
     def get_statevector(self):
-        return self._statevector
+        if self.method == 'matrix-mul':
+            psi = self._statevector
+        elif self.method == 'tensor-mul':
+            psi = self._statetensor.flatten()
+        return psi
