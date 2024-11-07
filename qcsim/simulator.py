@@ -1,4 +1,6 @@
 import functools
+import collections
+import random
 import numpy as np
 from qcsim.gates import I
 
@@ -64,3 +66,12 @@ class Simulator:
         elif self.method == 'tensor-mul':
             psi = self._statetensor.flatten()
         return psi
+
+    def sample(self, num_shots):
+        psi = self.get_statevector()
+        num_qubits = int(np.log2(len(psi)))
+        states = [np.binary_repr(i, width=num_qubits)
+                  for i in range(2**num_qubits)]
+        probs = np.square(np.abs(psi))
+        samples = random.choices(states, weights=probs, k=num_shots)
+        return dict(collections.Counter(samples))
