@@ -22,6 +22,7 @@ class Simulator:
         self._statetensor = state
 
     def _run_matrix_mul(self, circuit):
+        # 1) Naive simulation using matrix multiplication
         self._init_statevector(circuit.num_qubits)
         for layer in circuit._data:
             matrices = [gate.matrix for gate in layer[::-1]
@@ -45,6 +46,7 @@ class Simulator:
         self._statetensor = np.moveaxis(self._statetensor, (0, 1), (c, t))
 
     def _run_tensor_mul(self, circuit):
+        # 2) Advanced simulation using tensor multiplication
         self._init_statetensor(circuit.num_qubits)
         gates = [gate for layer in circuit._data for gate in layer
                  if gate is not None and not isinstance(gate, I)]
@@ -68,6 +70,7 @@ class Simulator:
         return psi
 
     def sample(self, num_shots):
+        # 3) Bonus question: sampling statevector
         psi = self.get_statevector()
         num_qubits = int(np.log2(len(psi)))
         states = [np.binary_repr(i, width=num_qubits)
