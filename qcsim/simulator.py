@@ -81,6 +81,9 @@ class Simulator:
 
     def expval(self, observable):
         # 3) Bonus question: computing exact expectation values
+        if not np.all(observable == observable.conj().T):  # hermitian matrix
+            error_message = 'The given observable must be an Hermitian matrix!'
+            raise ValueError(error_message)
         ket = self.get_statevector()
-        bra = ket.conjugate().transpose()
-        return bra @ observable @ ket
+        bra = ket.conj().T
+        return float(bra @ observable @ ket)
