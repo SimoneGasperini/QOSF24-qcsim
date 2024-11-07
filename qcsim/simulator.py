@@ -78,3 +78,9 @@ class Simulator:
         probs = np.square(np.abs(psi))
         samples = random.choices(states, weights=probs, k=num_shots)
         return dict(collections.Counter(samples))
+
+    def expval(self, observable):
+        # 3) Bonus question: computing exact expectation values
+        ket = self.get_statevector()
+        bra = ket.conjugate().transpose()
+        return bra @ observable @ ket
