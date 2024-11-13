@@ -4,7 +4,7 @@ import numpy
 
 class X:
     num_qubits = 1
-    matrix = numpy.array([[0, 1],
+    matrix = sympy.Array([[0, 1],
                           [1, 0]])
 
     def __init__(self, qubit):
@@ -16,7 +16,7 @@ class X:
 
 class H:
     num_qubits = 1
-    matrix = 1/numpy.sqrt(2) * numpy.array([[1, 1],
+    matrix = 1/sympy.sqrt(2) * sympy.Array([[1, 1],
                                             [1, -1]])
 
     def __init__(self, qubit):
@@ -28,7 +28,7 @@ class H:
 
 class CNOT:
     num_qubits = 2
-    matrix = numpy.array([[1, 0, 0, 0],
+    matrix = sympy.Array([[1, 0, 0, 0],
                           [0, 1, 0, 0],
                           [0, 0, 0, 1],
                           [0, 0, 1, 0]])

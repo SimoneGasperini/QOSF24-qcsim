@@ -10,8 +10,7 @@ class Simulator:
     def _init_statetensor(self, num_qubits):
         state = numpy.zeros((2,) * num_qubits)
         state[(0,) * num_qubits] = 1
-        self._statetensor = state
-        # self._statetensor = sympy.Array(state)
+        self._statetensor = sympy.Array(state)
 
     def _apply_1q_gate(self, gate):
         gate_tensor = gate.matrix
@@ -39,4 +38,4 @@ class Simulator:
     def get_statevector(self):
         num_qubits = len(self._statetensor.shape)
         psi = self._statetensor.reshape(2**num_qubits)
-        return psi
+        return numpy.array(psi, dtype=complex)
